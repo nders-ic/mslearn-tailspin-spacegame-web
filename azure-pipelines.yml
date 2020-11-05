@@ -48,61 +48,16 @@ steps:
       command: 'build'
       arguments: '--no-restore --configuration Release'
       projects: '**/*.csproj'
-# trigger:
-#   - '*'
 
-# pool:
-#   vmImage: 'windows-latest'
-#   demands:
-#     - npm
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish the project - Release'
+    inuputs:
+      command: 'publish'
+      projects: '**/*.csproj'
+      publishWebProjects: false
+      arguments: '--no-build --configuration Release --output $(Build.ArtifactStagingDirectory)/Release'
+      zipAfterPublish: true
 
-# variables:
-#   solution: '**/*.sln'
-#   buildPlatform: 'Any CPU'
-#   buildConfiguration: 'Release'
-
-# steps:
-# - task: UseDotNet@2
-#     inputs:
-#       packageType: sdk
-#       version: 3.1.300
-
-# - task: Npm@1
-#     inputs:
-#       verbose: false
-
-# - script: '.node_modules/.bin/node-sass Tailspin.SpaceGame.Web/wwwroot --output Tailspin.SpaceGame.Web/wwwroot'
-
-# - task: gulp@1
-
-# - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildInfo.txt'
-#     workingDirectory: Tailspin.SpaceGame.Web/wwwwroot
-
-# - task: DotNetcoreCLI@2
-#     inputs:
-#       command: 'restore'
-#       projects: '**/*.csproj'
-
-# - task: DotNetCoreCLI@2
-#     inputs:
-#       command: 'build'
-#       arguments: '--no-restore --configuration Release'
-#       projects: '**/*.csproj'
-
-# - task: NuGetToolInstaller@1
-
-# - task: NuGetCommand@2
-#   inputs:
-#     restoreSolution: '$(solution)'
-
-# - task: VSBuild@1
-#   inputs:
-#     solution: '$(solution)'
-#     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-#     platform: '$(buildPlatform)'
-#     configuration: '$(buildConfiguration)'
-
-# - task: VSTest@2
-#   inputs:
-#     platform: '$(buildPlatform)'
-#     configuration: '$(buildConfiguration)'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: drop'
+    condition: succeeded()
